@@ -8,6 +8,7 @@ import {
   ComposedChart, Line, Area, XAxis, YAxis, CartesianGrid, 
   Tooltip, ResponsiveContainer, Legend 
 } from 'recharts';
+import AgentPanel from '../components/AgentPanel';
 
 // Data templates for different ranges
 const forecastData = {
@@ -365,6 +366,24 @@ const PredictiveAnalytics = () => {
           ))}
         </div>
       </motion.div>
+      {/* AI Agent Panels */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <AgentPanel
+          agentName="Demand Forecasting Agent"
+          agentColor="text-purple-400"
+          agentBg="bg-purple-400/20"
+          role="grid_operator"
+          suggestedQueries={['Predict hourly demand', 'Predict weekly demand', 'Predict peak hours', 'Forecast transformer load', 'Forecast town energy demand']}
+          defaultOpen={true}
+        />
+        <AgentPanel
+          agentName="Predictive Maintenance Agent"
+          agentColor="text-yellow-400"
+          agentBg="bg-yellow-400/20"
+          role="grid_operator"
+          suggestedQueries={['Predict transformer failure', 'Show all transformer health scores', 'Show maintenance schedule', 'Analyze transformer temperatures']}
+        />
+      </div>
     </div>
   );
 };

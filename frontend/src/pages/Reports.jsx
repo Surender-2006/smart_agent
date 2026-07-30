@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { FileText, Download, Calendar } from 'lucide-react';
 import { jsPDF } from 'jspdf';
 import * as XLSX from 'xlsx';
+import AgentPanel from '../components/AgentPanel';
 
 const Reports = () => {
   const user = JSON.parse(localStorage.getItem('user') || '{}');
@@ -252,6 +253,31 @@ const Reports = () => {
             </div>
           </motion.div>
         ))}
+      </div>
+      {/* AI Agent Panels */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <AgentPanel
+          agentName="Smart Decision Support Agent"
+          agentColor="text-cyan-400"
+          agentBg="bg-cyan-400/20"
+          role="eb_officer"
+          suggestedQueries={['Generate operational recommendations', 'Analyze town energy consumption', 'Recommend resource allocation', 'Show transformer utilization']}
+          defaultOpen={true}
+        />
+        <AgentPanel
+          agentName="Carbon Analytics Agent"
+          agentColor="text-success"
+          agentBg="bg-success/20"
+          role="eb_officer"
+          suggestedQueries={['Generate sustainability report', 'Show CO₂ emissions', 'Compare monthly emissions']}
+        />
+        <AgentPanel
+          agentName="Anomaly Detection Agent"
+          agentColor="text-orange-400"
+          agentBg="bg-orange-400/20"
+          role="eb_officer"
+          suggestedQueries={['Show full anomaly report', 'Detect possible electricity theft', 'Show abnormal consumption patterns']}
+        />
       </div>
     </div>
   );

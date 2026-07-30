@@ -7,6 +7,7 @@ import dashboardRouter from './routes/dashboard.js';
 import devicesRouter from './routes/devices.js';
 import aiRouter from './routes/ai.js';
 import searchRouter from './routes/search.js';
+import orchestrator from './orchestrator.js';
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -25,7 +26,7 @@ app.use('/api/auth', authRouter);
 app.use('/api/dashboard', dashboardRouter);
 app.use('/api/devices', devicesRouter);
 app.use('/api/ai', aiRouter);
-app.use('/api/search', searchRouter);
+app.use('/api', orchestrator);
 
 import DeviceModel from './models/device.js';
 

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Wifi, Battery, Radio, AlertTriangle, X, Activity, Server, MapPin } from 'lucide-react';
 import axios from 'axios';
+import AgentPanel from '../components/AgentPanel';
 
 const IoTDevices = () => {
   const user = JSON.parse(localStorage.getItem('user') || '{}');
@@ -504,6 +505,47 @@ const IoTDevices = () => {
           </div>
         )}
       </AnimatePresence>
+      {/* AI Agent Panels */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {role === 'eb_officer' && (
+          <AgentPanel
+            agentName="Anomaly Detection Agent"
+            agentColor="text-orange-400"
+            agentBg="bg-orange-400/20"
+            role={role}
+            suggestedQueries={['Detect possible electricity theft', 'Check faulty smart meters', 'Show abnormal consumption patterns', 'Show full anomaly report']}
+            defaultOpen={true}
+          />
+        )}
+        {role === 'eb_officer' && (
+          <AgentPanel
+            agentName="Smart Decision Support Agent"
+            agentColor="text-cyan-400"
+            agentBg="bg-cyan-400/20"
+            role={role}
+            suggestedQueries={['Show IoT device status', 'Show consumer statistics', 'Recommend resource allocation']}
+          />
+        )}
+        {role === 'grid_operator' && (
+          <AgentPanel
+            agentName="Anomaly Detection Agent"
+            agentColor="text-orange-400"
+            agentBg="bg-orange-400/20"
+            role={role}
+            suggestedQueries={['Detect transformer anomalies', 'Check faulty IoT sensors', 'Show full anomaly report']}
+            defaultOpen={true}
+          />
+        )}
+        {role === 'grid_operator' && (
+          <AgentPanel
+            agentName="Grid Operations Intelligence Agent"
+            agentColor="text-danger"
+            agentBg="bg-danger/20"
+            role={role}
+            suggestedQueries={['Show live grid status', 'Check power quality', 'Show feeder status']}
+          />
+        )}
+      </div>
     </div>
   );
 };

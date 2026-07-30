@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ShieldAlert, AlertTriangle, AlertCircle, CheckCircle, Clock, X, Activity } from 'lucide-react';
+import AgentPanel from '../components/AgentPanel';
 
 const faults = [
   { id: 'F-892', equip: 'Transformer C', type: 'Voltage Fluctuation', severity: 'Critical', time: '10 mins ago', status: 'Unresolved', details: 'Input voltage dropped by 18% over a 2-minute window. AI models predict a 85% chance of complete phase loss within 48 hours. Recommend immediate inspection of primary winding.' },
@@ -188,6 +189,24 @@ const FaultDetection = () => {
           </div>
         )}
       </AnimatePresence>
+      {/* AI Agent Panels */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <AgentPanel
+          agentName="Grid Operations Intelligence Agent"
+          agentColor="text-danger"
+          agentBg="bg-danger/20"
+          role="grid_operator"
+          suggestedQueries={['Detect transformer faults', 'Show voltage fluctuations', 'Show feeder status', 'Show live grid status']}
+          defaultOpen={true}
+        />
+        <AgentPanel
+          agentName="Predictive Maintenance Agent"
+          agentColor="text-yellow-400"
+          agentBg="bg-yellow-400/20"
+          role="grid_operator"
+          suggestedQueries={['Predict transformer failure', 'Show all transformer health scores', 'Show maintenance schedule', 'Analyze transformer temperatures']}
+        />
+      </div>
     </div>
   );
 };

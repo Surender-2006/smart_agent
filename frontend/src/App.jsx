@@ -6,6 +6,7 @@ import DashboardLayout from './components/layout/DashboardLayout';
 import DashboardHome from './pages/DashboardHome';
 import EnergyMonitoring from './pages/EnergyMonitoring';
 import AIAssistant from './pages/AIAssistant';
+import AgentChat from './pages/AgentChat';
 import FaultDetection from './pages/FaultDetection';
 import CarbonAnalytics from './pages/CarbonAnalytics';
 import PredictiveAnalytics from './pages/PredictiveAnalytics';
@@ -32,6 +33,7 @@ function App() {
             <Route path="reports" element={<Reports />} />
             <Route path="settings" element={<Settings />} />
             <Route path="ai-assistant" element={<AIAssistant />} />
+            <Route path="agents/:agentId" element={<AgentChat />} />
           </Route>
         </Routes>
       </div>

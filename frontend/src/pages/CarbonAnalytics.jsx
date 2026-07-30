@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Leaf, TreePine, CloudRain, Factory, CloudLightning } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { jsPDF } from 'jspdf';
+import AgentPanel from '../components/AgentPanel';
 
 const mockCarbonData = [
   { month: 'Jan', emissions: 120, target: 150 },
@@ -114,6 +115,24 @@ const CarbonAnalytics = () => {
              </div>
            </div>
         </motion.div>
+      </div>
+      {/* AI Agent Panels */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <AgentPanel
+          agentName="Carbon Analytics Agent"
+          agentColor="text-success"
+          agentBg="bg-success/20"
+          role="eb_officer"
+          suggestedQueries={['Show CO₂ emissions', 'Show renewable energy contribution', 'Generate sustainability report', 'Compare monthly emissions', 'Show zone-wise carbon emissions']}
+          defaultOpen={true}
+        />
+        <AgentPanel
+          agentName="Smart Decision Support Agent"
+          agentColor="text-cyan-400"
+          agentBg="bg-cyan-400/20"
+          role="eb_officer"
+          suggestedQueries={['Suggest methods to reduce carbon emissions', 'Recommend resource allocation', 'Generate operational recommendations']}
+        />
       </div>
     </div>
   );

@@ -1,260 +1,186 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Send, Bot, User, BrainCircuit, Activity, Zap, Leaf } from 'lucide-react';
-import axios from 'axios';
+import { Zap, Activity, ShieldAlert, Wrench, Leaf, TrendingUp, BarChart3, BrainCircuit, ArrowRight, Bot } from 'lucide-react';
+
+const ALL_AGENTS = {
+  'energy-intelligence': {
+    name: 'Energy Intelligence Agent',
+    subtitle: 'Analyze usage, bills, appliances & savings',
+    icon: Zap,
+    color: 'text-primary',
+    bg: 'bg-primary/20',
+    border: 'border-primary/30',
+    glow: 'shadow-[0_0_20px_rgba(37,99,235,0.2)]',
+    roles: ['consumer'],
+    capabilities: ['Daily & monthly usage analysis', 'Bill explanation & prediction', 'Appliance-wise consumption', 'Personalized saving tips'],
+  },
+  'grid-operations': {
+    name: 'Grid Operations Intelligence Agent',
+    subtitle: 'Monitor transformers, voltage & load',
+    icon: Activity,
+    color: 'text-danger',
+    bg: 'bg-danger/20',
+    border: 'border-danger/30',
+    glow: 'shadow-[0_0_20px_rgba(239,68,68,0.2)]',
+    roles: ['grid_operator'],
+    capabilities: ['Live transformer health', 'Voltage & current monitoring', 'Feeder status', 'Load balancing recommendations'],
+  },
+  'anomaly-detection': {
+    name: 'Anomaly Detection Agent',
+    subtitle: 'Detect theft, tampering & abnormal behavior',
+    icon: ShieldAlert,
+    color: 'text-orange-400',
+    bg: 'bg-orange-400/20',
+    border: 'border-orange-400/30',
+    glow: 'shadow-[0_0_20px_rgba(251,146,60,0.2)]',
+    roles: ['eb_officer'],
+    capabilities: ['Abnormal consumption detection', 'Electricity theft indicators', 'Meter tampering alerts', 'Faulty IoT sensor detection'],
+  },
+  'predictive-maintenance': {
+    name: 'Predictive Maintenance Agent',
+    subtitle: 'Predict failures before they occur',
+    icon: Wrench,
+    color: 'text-yellow-400',
+    bg: 'bg-yellow-400/20',
+    border: 'border-yellow-400/30',
+    glow: 'shadow-[0_0_20px_rgba(250,204,21,0.2)]',
+    roles: ['grid_operator'],
+    capabilities: ['Transformer failure prediction', 'Health score calculation', 'Maintenance scheduling', 'Temperature & load analysis'],
+  },
+  'carbon-analytics': {
+    name: 'Carbon Analytics Agent',
+    subtitle: 'CO₂ emissions & sustainability reports',
+    icon: Leaf,
+    color: 'text-success',
+    bg: 'bg-success/20',
+    border: 'border-success/30',
+    glow: 'shadow-[0_0_20px_rgba(34,197,94,0.2)]',
+    roles: ['eb_officer'],
+    capabilities: ['CO₂ emission estimation', 'Renewable energy tracking', 'Monthly emission comparison', 'Sustainability reports'],
+  },
+  'demand-forecasting': {
+    name: 'Demand Forecasting Agent',
+    subtitle: 'Predict hourly, daily & monthly demand',
+    icon: TrendingUp,
+    color: 'text-purple-400',
+    bg: 'bg-purple-400/20',
+    border: 'border-purple-400/30',
+    glow: 'shadow-[0_0_20px_rgba(192,132,252,0.2)]',
+    roles: ['eb_officer', 'grid_operator'],
+    capabilities: ['Hourly & daily forecasts', 'Peak hour prediction', 'Transformer load forecast', 'Town energy demand forecast'],
+  },
+  'smart-decision': {
+    name: 'Smart Decision Support Agent',
+    subtitle: 'Town-wide analysis & AI recommendations',
+    icon: BarChart3,
+    color: 'text-cyan-400',
+    bg: 'bg-cyan-400/20',
+    border: 'border-cyan-400/30',
+    glow: 'shadow-[0_0_20px_rgba(34,211,238,0.2)]',
+    roles: ['eb_officer'],
+    capabilities: ['Town energy analysis', 'High-demand area identification', 'Load redistribution advice', 'Resource allocation recommendations'],
+  },
+  'role-assistant': {
+    name: 'Role-Based AI Assistant',
+    subtitle: 'Intelligent role-aware conversations',
+    icon: BrainCircuit,
+    color: 'text-accent',
+    bg: 'bg-accent/20',
+    border: 'border-accent/30',
+    glow: 'shadow-[0_0_20px_rgba(6,182,212,0.2)]',
+    roles: ['consumer', 'eb_officer', 'grid_operator'],
+    capabilities: ['Role-aware responses', 'General energy queries', 'Smart Town information', 'Guided assistance'],
+  },
+};
+
+const ROLE_LABELS = {
+  consumer: 'Consumer',
+  eb_officer: 'EB Officer',
+  grid_operator: 'Grid Operator',
+};
 
 const AIAssistant = () => {
-  const [messages, setMessages] = useState([
-    {
-      id: 1,
-      sender: 'ai',
-      type: 'orchestrator',
-      text: 'Hello! I am the AI Grid Intelligence Agent. I can provide insights on energy usage, detect faults, and optimize your grid. How can I assist you today?',
-    }
-  ]);
-  const [input, setInput] = useState('');
-  const [isTyping, setIsTyping] = useState(false);
   const [role, setRole] = useState('eb_officer');
-  const messagesEndRef = useRef(null);
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
+  const navigate = useNavigate();
 
   useEffect(() => {
     const userStr = localStorage.getItem('user');
     if (userStr) {
       try {
         const u = JSON.parse(userStr);
-        const userRole = u.role || 'eb_officer';
-        setRole(userRole);
-        
-        let welcomeText = 'Hello! I am the AI Grid Intelligence Agent. I can provide insights on energy usage, detect faults, and optimize your grid. How can I assist you today?';
-        if (userRole === 'consumer') {
-          welcomeText = 'Hello! I am your AI Home Energy Coach. I can provide insights on your personal household energy usage, connection status, monthly bills, and customized saving tips. How can I assist you today?';
-        } else if (userRole === 'grid_operator') {
-          welcomeText = 'Hello! I am the AI Grid Operations Assistant. I can provide transformer performance checks, overload diagnostics, feeder statuses, and load balancing suggestions. How can I assist you today?';
-        }
-        
-        setMessages([
-          {
-            id: 1,
-            sender: 'ai',
-            type: 'orchestrator',
-            text: welcomeText,
-          }
-        ]);
-      } catch (e) {}
+        setRole(u.role || 'eb_officer');
+      } catch (_) {}
     }
   }, []);
 
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages, isTyping]);
-
-  const handleSend = async (e) => {
-    e.preventDefault();
-    if (!input.trim()) return;
-
-    const userMessageText = input;
-    const newMsg = { id: Date.now(), sender: 'user', text: userMessageText };
-    setMessages((prev) => [...prev, newMsg]);
-    setInput('');
-    setIsTyping(true);
-
-    try {
-      const response = await axios.post('/api/ai/chat', { message: userMessageText, role });
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: response.data.id,
-          sender: 'ai',
-          type: response.data.type,
-          text: response.data.text
-        }
-      ]);
-    } catch (err) {
-      console.error('Error communicating with AI agent:', err);
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: Date.now() + 1,
-          sender: 'ai',
-          type: 'orchestrator',
-          text: 'Sorry, I encountered an error communicating with the backend. Please check your connection.'
-        }
-      ]);
-    } finally {
-      setIsTyping(false);
-    }
-  };
-
-  const agentConfig = {
-    orchestrator: { icon: BrainCircuit, color: 'text-accent', bg: 'bg-accent/20', name: 'AI Grid Intelligence Agent' },
-    energy: { icon: Zap, color: 'text-primary', bg: 'bg-primary/20', name: 'Energy Monitoring Agent' },
-    fault: { icon: Activity, color: 'text-danger', bg: 'bg-danger/20', name: 'Fault Detection Agent' },
-    carbon: { icon: Leaf, color: 'text-success', bg: 'bg-success/20', name: 'Carbon Footprint Agent' },
-  };
+  const myAgents = Object.entries(ALL_AGENTS).filter(([, a]) => a.roles.includes(role));
 
   return (
-    <div className="flex h-[calc(100vh-8rem)] gap-6">
-      {/* Left Panel: Workflow / History */}
-      <div className="w-1/3 hidden lg:flex flex-col gap-6">
-        <motion.div 
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          className="glass p-6 rounded-2xl flex-1 flex flex-col"
-        >
-          <h3 className="text-lg font-bold text-white mb-6">Multi-Agent Workflow</h3>
-          <div className="flex-1 flex flex-col items-center justify-center relative">
-            {/* Simple Animated Workflow visualization */}
-            <div className="w-full flex justify-center mb-8">
-              <div className="p-4 rounded-full bg-accent/20 border border-accent/50 animate-pulse z-10">
-                <BrainCircuit className="w-8 h-8 text-accent" />
-              </div>
-            </div>
-            
-            {/* Connecting lines */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[80%] w-px h-16 bg-gradient-to-b from-accent to-transparent z-0" />
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 w-48 h-px bg-white/20 z-0" />
-            <div className="absolute top-1/2 left-1/2 -translate-x-[6rem] h-8 w-px bg-white/20 z-0" />
-            <div className="absolute top-1/2 left-1/2 translate-x-[6rem] h-8 w-px bg-white/20 z-0" />
-            
-            <div className="w-full flex justify-between px-8 mt-12 z-10">
-               <div className="p-3 rounded-full bg-primary/20 border border-primary/50">
-                  <Zap className="w-5 h-5 text-primary" />
-               </div>
-               <div className="p-3 rounded-full bg-danger/20 border border-danger/50">
-                  <Activity className="w-5 h-5 text-danger" />
-               </div>
-               <div className="p-3 rounded-full bg-success/20 border border-success/50">
-                  <Leaf className="w-5 h-5 text-success" />
-               </div>
-            </div>
-            <p className="text-gray-400 text-sm mt-12 text-center">
-              The AI Grid Intelligence Agent delegates tasks to specialized AI agents in real-time.
-            </p>
-          </div>
-        </motion.div>
+    <div className="space-y-8">
+      {/* Header */}
+      <div className="flex items-start justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-white mb-2 flex items-center gap-3">
+            <Bot className="w-8 h-8 text-accent" /> Multi-Agent AI System
+          </h1>
+          <p className="text-gray-400">
+            Select an AI agent below to open its dedicated chat. Each agent is specialized for your role as a <span className="text-white font-medium">{ROLE_LABELS[role]}</span>.
+          </p>
+        </div>
+        <div className="flex items-center gap-2 px-4 py-2 glass rounded-xl border border-accent/30">
+          <div className="w-2 h-2 rounded-full bg-accent animate-pulse" />
+          <span className="text-accent text-sm font-medium">{myAgents.length} Agents Available</span>
+        </div>
       </div>
 
-      {/* Right Panel: Chat Interface */}
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="flex-1 glass rounded-2xl flex flex-col overflow-hidden"
-      >
-        <div className="p-4 border-b border-white/10 bg-white/5">
-          <h2 className="text-lg font-bold text-white flex items-center gap-2">
-            <Bot className="w-6 h-6 text-accent" /> EcoGrid AI Assistant
-          </h2>
-        </div>
-
-        <div className="flex-1 overflow-y-auto p-6 space-y-6">
-          {messages.map((msg) => (
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              key={msg.id} 
-              className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+      {/* Agent Cards Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+        {myAgents.map(([agentId, agent], idx) => {
+          const AgentIcon = agent.icon;
+          return (
+            <motion.div
+              key={agentId}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: idx * 0.07 }}
+              onClick={() => navigate(`/dashboard/agents/${agentId}`)}
+              className={`glass p-6 rounded-2xl border ${agent.border} cursor-pointer hover:bg-white/5 transition-all duration-300 group ${agent.glow} hover:scale-[1.02]`}
             >
-              <div className={`flex max-w-[80%] gap-3 ${msg.sender === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
-                {msg.sender === 'user' ? (
-                  <div className="w-8 h-8 rounded-full bg-primary/30 flex items-center justify-center shrink-0">
-                    <User className="w-4 h-4 text-primary" />
-                  </div>
-                ) : (
-                  <div className={`w-8 h-8 rounded-full ${agentConfig[msg.type].bg} flex items-center justify-center shrink-0`}>
-                    {React.createElement(agentConfig[msg.type].icon, { className: `w-4 h-4 ${agentConfig[msg.type].color}` })}
-                  </div>
-                )}
-                
-                <div className={`flex flex-col ${msg.sender === 'user' ? 'items-end' : 'items-start'}`}>
-                  {msg.sender === 'ai' && (
-                    <span className={`text-xs mb-1 font-medium ${agentConfig[msg.type].color}`}>
-                      {agentConfig[msg.type].name}
-                    </span>
-                  )}
-                  <div className={`px-4 py-3 rounded-2xl text-sm whitespace-pre-wrap ${
-                    msg.sender === 'user' 
-                      ? 'bg-primary text-white rounded-tr-sm' 
-                      : 'bg-white/10 text-gray-200 border border-white/5 rounded-tl-sm'
-                  }`}>
-                    {msg.text}
-                  </div>
+              {/* Icon + Name */}
+              <div className="flex items-start justify-between mb-4">
+                <div className={`p-3 rounded-xl ${agent.bg} border ${agent.border}`}>
+                  <AgentIcon className={`w-6 h-6 ${agent.color}`} />
+                </div>
+                <div className={`p-2 rounded-lg bg-white/5 group-hover:bg-white/10 transition-colors`}>
+                  <ArrowRight className={`w-4 h-4 ${agent.color} group-hover:translate-x-0.5 transition-transform`} />
                 </div>
               </div>
-            </motion.div>
-          ))}
-          {isTyping && (
-             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex justify-start">
-               <div className="flex gap-3 max-w-[80%]">
-                 <div className="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center shrink-0">
-                    <Bot className="w-4 h-4 text-accent" />
-                 </div>
-                 <div className="px-4 py-3 rounded-2xl bg-white/10 border border-white/5 rounded-tl-sm flex items-center gap-1">
-                   <div className="w-2 h-2 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: '0ms' }} />
-                   <div className="w-2 h-2 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: '150ms' }} />
-                   <div className="w-2 h-2 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: '300ms' }} />
-                 </div>
-               </div>
-             </motion.div>
-          )}
-          <div ref={messagesEndRef} />
-        </div>
 
-        {/* Input Area */}
-        <div className="p-4 border-t border-white/10 bg-white/5">
-            <div className="flex gap-2 mb-3 overflow-x-auto pb-2 scrollbar-hide">
-              {(role === 'consumer' ? [
-                'What is my electricity usage today?',
-                'Show my monthly electricity bill.',
-                'How can I reduce my electricity bill?',
-                'Show my appliance energy consumption.',
-                'Is there a scheduled power outage in my area?',
-                'Give me personalized energy-saving tips.'
-              ] : role === 'grid_operator' ? [
-                'Check all transformers',
-                'Show overloaded transformers',
-                'Detect transformer faults',
-                'Predict evening peak demand',
-                'Suggest load redistribution',
-                'Show live grid status'
-              ] : [
-                "Show today's town energy consumption",
-                'Which zone consumed the most electricity?',
-                'Show transformer performance',
-                'Show total active consumers',
-                'Show carbon reduction statistics',
-                'Which transformer requires maintenance?'
-              ]).map((prompt, idx) => (
-               <button 
-                  key={idx} 
-                  onClick={() => setInput(prompt)}
-                  className="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-xs text-gray-300 whitespace-nowrap transition-colors"
-               >
-                 {prompt}
-               </button>
-             ))}
-           </div>
-          <form onSubmit={handleSend} className="flex gap-3">
-            <input
-              type="text"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              placeholder="Ask the EcoGrid AI anything..."
-              className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-accent transition-all"
-            />
-            <button 
-              type="submit"
-              disabled={!input.trim() || isTyping}
-              className="p-3 bg-accent hover:bg-cyan-500 text-black rounded-xl font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_0_15px_rgba(6,182,212,0.4)]"
-            >
-              <Send className="w-5 h-5" />
-            </button>
-          </form>
-        </div>
-      </motion.div>
+              <h3 className="text-white font-bold text-base mb-1 leading-tight">{agent.name}</h3>
+              <p className={`text-xs ${agent.color} mb-4`}>{agent.subtitle}</p>
+
+              {/* Capabilities */}
+              <ul className="space-y-1.5">
+                {agent.capabilities.map((cap, i) => (
+                  <li key={i} className="flex items-center gap-2 text-xs text-gray-400">
+                    <div className={`w-1.5 h-1.5 rounded-full ${agent.bg} border ${agent.border} shrink-0`} />
+                    {cap}
+                  </li>
+                ))}
+              </ul>
+
+              {/* Open Chat button */}
+              <div className={`mt-5 pt-4 border-t border-white/10 flex items-center justify-between`}>
+                <span className="text-xs text-gray-500">Click to open chat</span>
+                <span className={`text-xs font-semibold ${agent.color} flex items-center gap-1`}>
+                  Open Chat <ArrowRight className="w-3 h-3" />
+                </span>
+              </div>
+            </motion.div>
+          );
+        })}
+      </div>
     </div>
   );
 };

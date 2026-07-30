@@ -4,6 +4,7 @@ import { Zap, Activity, IndianRupee, TrendingDown, TrendingUp, Server, CloudLigh
 import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import axios from 'axios';
 import { jsPDF } from 'jspdf';
+import AgentPanel from '../components/AgentPanel';
 
 // Base data templates for consumer (household level)
 const consumerTodayData = [
@@ -1004,6 +1005,65 @@ const DashboardHome = () => {
             </div>
           </div>
 
+        </div>
+      )}
+
+      {/* AI Agent Panel — role-specific, shown below main content */}
+      {role === 'consumer' && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <AgentPanel
+            agentName="Energy Intelligence Agent"
+            agentColor="text-primary"
+            agentBg="bg-primary/20"
+            role="consumer"
+            suggestedQueries={['What is my electricity usage today?', 'Show my monthly electricity bill', 'Which appliance uses the most electricity?', 'Predict my next month bill', 'Compare my monthly usage']}
+            defaultOpen={true}
+          />
+          <AgentPanel
+            agentName="Role-Based AI Assistant Agent"
+            agentColor="text-accent"
+            agentBg="bg-accent/20"
+            role="consumer"
+            suggestedQueries={['Show my personal alerts', 'Give me energy-saving tips', 'Is my home receiving normal voltage?']}
+          />
+        </div>
+      )}
+      {role === 'eb_officer' && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <AgentPanel
+            agentName="Smart Decision Support Agent"
+            agentColor="text-cyan-400"
+            agentBg="bg-cyan-400/20"
+            role="eb_officer"
+            suggestedQueries={['Analyze town energy consumption', 'Identify high-demand areas', 'Generate operational recommendations']}
+            defaultOpen={true}
+          />
+          <AgentPanel
+            agentName="Demand Forecasting Agent"
+            agentColor="text-purple-400"
+            agentBg="bg-purple-400/20"
+            role="eb_officer"
+            suggestedQueries={['Predict monthly demand', 'Predict peak hours', 'Forecast town energy demand']}
+          />
+        </div>
+      )}
+      {role === 'grid_operator' && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <AgentPanel
+            agentName="Grid Operations Intelligence Agent"
+            agentColor="text-danger"
+            agentBg="bg-danger/20"
+            role="grid_operator"
+            suggestedQueries={['Show live grid status', 'Check all transformers', 'Suggest load balancing']}
+            defaultOpen={true}
+          />
+          <AgentPanel
+            agentName="Predictive Maintenance Agent"
+            agentColor="text-yellow-400"
+            agentBg="bg-yellow-400/20"
+            role="grid_operator"
+            suggestedQueries={['Predict transformer failure', 'Show all transformer health scores', 'Show maintenance schedule']}
+          />
         </div>
       )}
 

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
 import { Activity, Zap, Server, TrendingUp, TrendingDown, Clock } from 'lucide-react';
+import AgentPanel from '../components/AgentPanel';
 
 // Base data templates
 const baseTodayData = [
@@ -316,6 +317,45 @@ const EnergyMonitoring = () => {
             <p className="text-xs text-gray-400">Data refreshes every 3 seconds from town IoT sensors.</p>
           </div>
         </motion.div>
+      </div>
+      {/* AI Agent Panel */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {role === 'grid_operator' && (
+          <AgentPanel
+            agentName="Grid Operations Intelligence Agent"
+            agentColor="text-danger"
+            agentBg="bg-danger/20"
+            role={role}
+            suggestedQueries={['Show live grid status', 'Check all transformers', 'Show voltage fluctuations', 'Suggest load balancing']}
+          />
+        )}
+        {role === 'grid_operator' && (
+          <AgentPanel
+            agentName="Demand Forecasting Agent"
+            agentColor="text-purple-400"
+            agentBg="bg-purple-400/20"
+            role={role}
+            suggestedQueries={['Predict hourly demand', 'Predict peak hours', 'Forecast transformer load']}
+          />
+        )}
+        {role === 'eb_officer' && (
+          <AgentPanel
+            agentName="Smart Decision Support Agent"
+            agentColor="text-cyan-400"
+            agentBg="bg-cyan-400/20"
+            role={role}
+            suggestedQueries={['Analyze town energy consumption', 'Identify high-demand areas', 'Recommend load redistribution']}
+          />
+        )}
+        {role === 'eb_officer' && (
+          <AgentPanel
+            agentName="Demand Forecasting Agent"
+            agentColor="text-purple-400"
+            agentBg="bg-purple-400/20"
+            role={role}
+            suggestedQueries={['Predict monthly demand', 'Predict peak hours', 'Forecast town energy demand']}
+          />
+        )}
       </div>
     </div>
   );
